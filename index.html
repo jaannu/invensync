@@ -1,0 +1,129 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>InvenSync Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; background: #f4f4f4; }
+    h1 { background: #3f51b5; color: white; padding: 15px; margin: 0; }
+    .container { display: flex; }
+    .sidebar {
+      width: 250px; padding: 15px; background: white; border-right: 1px solid #ccc;
+    }
+    .main { flex: 1; padding: 20px; }
+    button {
+      padding: 10px 15px; background-color: #3f51b5; color: white;
+      border: none; border-radius: 5px; cursor: pointer;
+    }
+    button:hover { background-color: #303f9f; }
+  </style>
+</head>
+<body>
+  <h1>InvenSync Dashboard</h1>
+
+  <div class="container">
+    <div class="sidebar">
+      <h3>Notifications</h3>
+      <p id="notifications">Loading...</p>
+      <hr />
+      <h3>Metrics</h3>
+      <p>Total Bins: <span id="totalBins">0</span></p>
+      <p>Critical: <span id="criticalBins">0</span></p>
+      <hr />
+      <button onclick="window.location.href='/ar'">📷 Open AR View</button>
+    </div>
+    <div class="main">
+      <canvas id="stockChart" height="150"></canvas>
+      <hr />
+      <button onclick="startListening()">🎤 Start Voice Update</button>
+      <p><em>Say "Update Bin A to 100"</em></p>
+    </div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBV9mhdIDzxIhnodIB-NCzYZvsIcfQBruQ",
+      authDomain: "invensync-551a4.firebaseapp.com",
+      databaseURL: "https://invensync-551a4-default-rtdb.firebaseio.com",
+      projectId: "invensync-551a4",
+      storageBucket: "invensync-551a4.appspot.com",
+      messagingSenderId: "295889603496",
+      appId: "1:295889603496:web:adf57cc10a87461b462b9d"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const ctx = document.getElementById("stockChart").getContext("2d");
+    let chart;
+
+    db.ref("bins").on("value", snapshot => {
+      const data = snapshot.val();
+      if (!data) return;
+
+      const labels = [], quantities = [], colors = [];
+      let criticalCount = 0;
+
+      Object.entries(data).forEach(([bin, { qty }]) => {
+        labels.push(bin);
+        quantities.push(qty);
+        colors.push(qty < 20 ? "red" : qty < 50 ? "orange" : "green");
+        if (qty < 20) criticalCount++;
+      });
+
+      document.getElementById("totalBins").innerText = labels.length;
+      document.getElementById("criticalBins").innerText = criticalCount;
+      document.getElementById("notifications").innerText =
+        criticalCount > 0 ? "⚠️ Critical bins detected!" : "✅ All bins are normal";
+
+      if (chart) {
+        chart.data.labels = labels;
+        chart.data.datasets[0].data = quantities;
+        chart.data.datasets[0].backgroundColor = colors;
+        chart.update();
+      } else {
+        chart = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels,
+            datasets: [{
+              label: "Stock Quantity",
+              data: quantities,
+              backgroundColor: colors
+            }]
+          },
+          options: {
+            responsive: true,
+            scales: { y: { beginAtZero: true, max: 150 } }
+          }
+        });
+      }
+    });
+
+    function startListening() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) return alert("❌ Speech Recognition not supported.");
+      const recognition = new SpeechRecognition();
+      recognition.lang = "en-US";
+      recognition.onresult = e => {
+        const text = e.results[0][0].transcript;
+        console.log("You said:", text);
+        const match = text.match(/(?:update|set)?\s*bin\s*(\w+)\s*(?:to|quantity)?\s*(\d+)/i);
+        if (match) {
+          const bin = "Bin " + match[1].toUpperCase();
+          const qty = parseInt(match[2]);
+          db.ref("bins/" + bin).set({ qty });
+          alert(`✅ Updated ${bin} to ${qty}`);
+        } else {
+          alert("❌ Couldn't recognize the update command.\nYou said: " + text);
+        }
+      };
+      recognition.start();
+    }
+  </script>
+</body>
+</html>
