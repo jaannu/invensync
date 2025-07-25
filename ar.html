@@ -40,25 +40,18 @@
     <a-scene embedded arjs>
       <!-- Custom marker -->
       <a-marker type="pattern" url="pattern-logo.patt" id="binMarker">
+ <a-marker type="pattern" url="pattern-logo.patt" id="binMarker">
   <a-box position="0 0.5 0" material="color: grey;"></a-box>
   <a-text
-  id="binLabel"
-  value="Loading..."
-  position="0 1 0"
-  rotation="-90 0 0"
-  look-at="[camera]"
-  align="center"
-  color="black"
-  scale="2 2 0.1"
-></a-text>
-
-
+    id="binLabel"
+    value="Loading..."
+    position="0 1 0"
+    rotation="-90 0 0"
+    align="center"
+    color="black"
+    scale="2 2 1"
+  ></a-text>
 </a-marker>
-
-
-
-
-
 
      <a-entity camera></a-entity>
     </a-scene>
