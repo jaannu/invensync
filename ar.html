@@ -32,6 +32,8 @@
         <option value="Bin A">Bin A</option>
         <option value="Bin B">Bin B</option>
         <option value="Bin C">Bin C</option>
+        <option value="Bin D">Bin C</option>
+        <option value="Bin E">Bin C</option>
       </select>
     </div>
 
@@ -42,10 +44,17 @@
         <a-text id="binLabel" value="Loading..." position="0 1.2 0" align="center" color="black" scale="1.5 1.5 1"></a-text>
       </a-marker>
 
-      <!-- Grey grid background as plane -->
-      <a-plane position="0 0 0" rotation="-90 0 0" width="10" height="10" color="#d3d3d3" shadow></a-plane>
-      
-      <a-entity camera></a-entity>
+    <a-text
+  id="binLabel"
+  value="Loading..."
+  position="0 2 0"
+  align="center"
+  color="black"
+  scale="3 3 3"
+  rotation="0 0 0"
+></a-text>
+
+     <a-entity camera></a-entity>
     </a-scene>
 
     <script>
