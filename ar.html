@@ -32,28 +32,20 @@
         <option value="Bin A">Bin A</option>
         <option value="Bin B">Bin B</option>
         <option value="Bin C">Bin C</option>
-        <option value="Bin D">Bin D</option>
-        <option value="Bin E">Bin E</option>
       </select>
     </div>
 
     <a-scene embedded arjs>
       <!-- Custom marker -->
-      <a-marker type="pattern" url="pattern-logo.patt" id="binMarker">
- <a-marker type="pattern" url="pattern-logo.patt" id="binMarker">
-  <a-box position="0 0.5 0" material="color: grey;"></a-box>
-  <a-text
-    id="binLabel"
-    value="Loading..."
-    position="0 1 0"
-    rotation="-90 0 0"
-    align="center"
-    color="black"
-    scale="2 2 1"
-  ></a-text>
-</a-marker>
+      <a-marker type="pattern" url="/static/pattern-logo.patt" id="binMarker">
+        <a-box position="0 0.5 0" material="color: grey;"></a-box>
+        <a-text id="binLabel" value="Loading..." position="0 1.2 0" align="center" color="black" scale="1.5 1.5 1"></a-text>
+      </a-marker>
 
-     <a-entity camera></a-entity>
+      <!-- Grey grid background as plane -->
+      <a-plane position="0 0 0" rotation="-90 0 0" width="10" height="10" color="#d3d3d3" shadow></a-plane>
+      
+      <a-entity camera></a-entity>
     </a-scene>
 
     <script>
