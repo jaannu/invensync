@@ -5,6 +5,9 @@
   <meta charset="UTF-8" />
   <title>InvenSync Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <!-- Firebase Messaging SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging-compat.js"></script>
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
@@ -35,7 +38,7 @@
       <p>Total Bins: <span id="totalBins">0</span></p>
       <p>Critical: <span id="criticalBins">0</span></p>
       <hr />
-      <button onclick="window.location.href='https://jaannu.github.io/invensync/ar.html'">📷 Open AR View</button>
+      <button onclick="window.location.href='/ar'">📷 Open AR View</button>
     </div>
     <div class="main">
       <canvas id="stockChart" height="150"></canvas>
@@ -124,6 +127,31 @@
       };
       recognition.start();
     }
+    const messaging = firebase.messaging();
+
+// Request permission
+messaging
+  .requestPermission()
+  .then(() => {
+    console.log("🔔 Notification permission granted.");
+    return messaging.getToken({
+      vapidKey: "YOUR_WEB_PUSH_CERTIFICATE_KEY"
+    });
+  })
+  .then((token) => {
+    console.log("✅ FCM Token:", token);
+    // You can save this token to Firebase if needed
+  })
+  .catch((err) => {
+    console.error("🚫 Unable to get permission to notify.", err);
+  });
+
+// Listen for foreground messages
+messaging.onMessage((payload) => {
+  console.log("🔔 Message received. ", payload);
+  alert(`📢 Notification: ${payload.notification.title}\n${payload.notification.body}`);
+});
+
   </script>
 </body>
 </html>
